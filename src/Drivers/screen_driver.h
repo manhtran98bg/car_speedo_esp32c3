@@ -3,7 +3,7 @@
 #include <Arduino_GFX_Library.h>
 #include "user_config.h"
 
-class ScreenDriver : public Arduino_Canvas
+class ScreenDriver
 {
 public:
     ScreenDriver();
@@ -14,9 +14,8 @@ public:
     void fadeIn();
     void drawRect(uint16_t *data, int16_t x, int16_t y, int16_t w, int16_t h);
     void drawRegion(uint16_t *data, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
-    
+    Arduino_GFX *getScreen();
 private:
-    void setDriver(Arduino_G *gfx);
     // LEDC constants
     static constexpr int LEDC_TIMER_RES = 8;
     static constexpr int LEDC_DUTY_MIN = 0;

@@ -236,7 +236,7 @@ void gif_task(void *pvParameters)
 			currentMode = UI_MODE_GIF;
 			if (xSemaphoreTake(displayMutex, pdMS_TO_TICKS(100)) == pdTRUE)
 			{
-				Screen.fillScreen(BLACK);
+				Screen.getScreen()->fillScreen(BLACK);
 				Serial.printf("Playing GIF: %s\n", filename);
 				show_gif(filename);
 				xSemaphoreGive(displayMutex);
