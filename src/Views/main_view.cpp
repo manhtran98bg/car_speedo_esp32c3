@@ -7,6 +7,7 @@
 #include "Models/data_model.h"
 #include "Drivers/screen_driver.h"
 
+#include "gif_view.h"
 // ==== Display driver ==== //
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf1[TFT_HOR_RES * 40];
@@ -113,7 +114,7 @@ void main_view_init()
     lv_disp_drv_register(&disp_drv);
 
     ui_init();
-
+    gif_view_init();
     needle_Animation(uic_img_needle, 200);
     lv_timer_create([](lv_timer_t *t)
                     {

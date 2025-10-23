@@ -46,5 +46,6 @@ enum UiMode
 // Draw buffer sizes
 #define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
 #define DRAW_BUF_SIZE1 (TFT_HOR_RES * TFT_VER_RES / 10)
-
+extern SemaphoreHandle_t displayMutex;
+extern volatile UiMode currentMode;
 #endif // _USER_CONFIG_H_
