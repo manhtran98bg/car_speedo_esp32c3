@@ -5,7 +5,7 @@ ScreenDriver Screen;
 ScreenDriver::ScreenDriver()
     : Arduino_Canvas(LCD_WIDTH, LCD_HEIGHT, nullptr)
 {
-    _bus = new Arduino_ESP32SPI(LCD_DC, LCD_CS, LCD_SCLK, LCD_SDA, -1, HSPI);
+    _bus = new Arduino_ESP32SPI(LCD_DC, LCD_CS, LCD_SCLK, LCD_SDA, -1, FSPI);
     _tft = new Arduino_GC9A01(_bus, LCD_RST, 0, true, LCD_WIDTH, LCD_HEIGHT);
     this->setDriver(_tft);
 }
