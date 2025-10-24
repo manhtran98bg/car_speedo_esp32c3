@@ -81,11 +81,15 @@ void MjpegPlayer::_taskLoop()
                 _stopRequested = false;
                 _input = &file;
                 _inputindex = 0;
+                const uint32_t frameDelay = 1000 / 15; // 15 fps
                 while (_input->available() && !_stopRequested)
                 {
+                    uint32_t start = millis();
                     if (_readMjpegBuf())
                         _drawJpg();
-                    vTaskDelay(pdMS_TO_TICKS(5));
+                    uint32_t elapsed = millis() - start;
+                    // vTaskDelay(pdMS_TO_TICKS(5));
+                    if (elapsed < frameDelay) vTaskDelay(frameDelay - elapsed);
                 }
 
                 file.close();

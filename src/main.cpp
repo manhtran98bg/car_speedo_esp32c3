@@ -36,8 +36,8 @@ static void onVideoPlayDone(const char *file)
 	if (strcasecmp(file, splash_video_file) == 0)
 	{
 		main_view_init();
-		gif_onPlayDoneCallback(onGifPlayDone);
-		gif_request_show("/gif/1.gif");
+		// gif_onPlayDoneCallback(onGifPlayDone);
+		// gif_request_show("/gif/1.gif");
 	}
 }
 
@@ -45,14 +45,14 @@ static void onAudioPlayDone(const char *file)
 {
 	if (strcasecmp(file, splash_audio_file) == 0)
 	{
-		audioPlayer->playFile(welcome_audio_file);
+		// audioPlayer->playFile(welcome_audio_file);
 	}
 }
 
 void setup()
 {
 	// put your setup code here, to run once:
-	delay(2000);
+	// delay(2000);
 	Serial.begin(115200);
 
 	// Version Arduino Core
