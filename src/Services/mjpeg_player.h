@@ -5,21 +5,6 @@
 #include "LittleFS.h"
 #include <JPEGDEC.h>
 
-// ==== Command type ====
-typedef enum
-{
-    MJPEG_CMD_NONE = 0,
-    MJPEG_CMD_PLAY,
-    MJPEG_CMD_STOP
-} mjpeg_cmd_t;
-
-// ==== Command struct ====
-typedef struct
-{
-    mjpeg_cmd_t cmd;
-    String filePath;
-} mjpeg_msg_t;
-
 class MjpegPlayer
 {
 public:
@@ -70,6 +55,19 @@ private:
     JPEGDEC _jpeg;
     int _scale = -1;
     int32_t _remain = 0;
+
+    enum CmdType
+    {
+        CMD_NONE,
+        CMD_PLAY,
+        CMD_STOP
+    };
+
+    struct Msg
+    {
+        CmdType cmd;
+        char filePath[128];
+    };
 };
 
 #endif // _MJPEG_PLAYER_H_

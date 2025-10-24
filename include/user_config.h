@@ -37,6 +37,14 @@ constexpr lv_color_t PALETTE_DARK_GREY = LV_COLOR_MAKE(60, 60, 60);
 constexpr lv_color_t PALETTE_AMBER = LV_COLOR_MAKE(250, 140, 0);
 constexpr lv_color_t PALETTE_RED = LV_COLOR_MAKE(255, 0, 0);
 
+// Audio
+
+#define I2S_DIN 3
+#define I2S_WS 1
+#define I2S_BCLK 2
+#define I2S_PORT I2S_NUM_0
+#define SAMPLE_RATE 44100
+
 enum UiMode
 {
     UI_MODE_ODO,

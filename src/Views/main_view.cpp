@@ -102,8 +102,6 @@ static void mainUi_task(void *param)
 void main_view_init()
 {
     lv_init();
-    // lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(240 * 40 * sizeof(lv_color_t),
-    //                                              MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
     lv_disp_draw_buf_init(&draw_buf, buf1, NULL, TFT_HOR_RES * 40);
     lv_disp_drv_init(&disp_drv);
     disp_drv.hor_res = TFT_HOR_RES;
@@ -112,7 +110,6 @@ void main_view_init()
     disp_drv.draw_buf = &draw_buf;
     disp_drv.full_refresh = true;
     lv_disp_drv_register(&disp_drv);
-
     ui_init();
     gif_view_init();
     needle_Animation(uic_img_needle, 200);

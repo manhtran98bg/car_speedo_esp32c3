@@ -2,3 +2,4 @@
 
 void gif_view_init();
 void gif_request_show(const char *filename);
+void gif_onPlayDoneCallback(void (*cb)(const char* file));

@@ -16,7 +16,7 @@ MjpegPlayer::MjpegPlayer(JPEG_DRAW_CALLBACK *pfnDraw,
     _inputindex = 0;
     _x = x;
     _y = y;
-    _queue = xQueueCreate(3, sizeof(mjpeg_msg_t));
+    _queue = xQueueCreate(3, sizeof(Msg));
     _mjpeg_buf = (uint8_t *)malloc(MJPEG_BUFFER_SIZE);
     _read_buf = (uint8_t *)malloc(READ_BUFFER_SIZE);
 
@@ -41,13 +41,16 @@ void MjpegPlayer::begin(BaseType_t core)
 
 void MjpegPlayer::playFile(const char *path)
 {
-    mjpeg_msg_t msg = {MJPEG_CMD_PLAY, path};
+    if (!_queue)
+        return;
+    Msg msg = {CMD_PLAY, ""};
+    strncpy(msg.filePath, path, sizeof(msg.filePath) - 1);
     xQueueSend(_queue, &msg, portMAX_DELAY);
 }
 
 void MjpegPlayer::stop()
 {
-    mjpeg_msg_t msg = {MJPEG_CMD_STOP, ""};
+    Msg msg = {CMD_STOP, ""};
     xQueueSend(_queue, &msg, portMAX_DELAY);
 }
 
@@ -61,24 +64,20 @@ void MjpegPlayer::_taskEntry(void *param)
 
 void MjpegPlayer::_taskLoop()
 {
-    mjpeg_msg_t msg;
-    static char buf[64];
+    Msg msg;
     while (true)
     {
         if (xQueueReceive(_queue, &msg, portMAX_DELAY))
         {
-            if (msg.cmd == MJPEG_CMD_PLAY)
+            if (msg.cmd == CMD_PLAY)
             {
                 File file = LittleFS.open(msg.filePath);
                 if (!file)
                 {
-                    Serial.printf("❌ Cannot open %s\n", msg.filePath.c_str());
+                    Serial.printf("[MJPEG] Cannot open %s\n", msg.filePath);
                     continue;
                 }
-                Serial.printf("[MJPEG] ▶️ Playing: %s\n", msg.filePath.c_str());
-                memset(buf, 0, sizeof(buf));
-                strncpy(buf, msg.filePath.c_str(), sizeof(buf) - 1);
-                buf[sizeof(buf) - 1] = '\0';
+                Serial.printf("[MJPEG] Playing: %s\n", msg.filePath);
                 _stopRequested = false;
                 _input = &file;
                 _inputindex = 0;
@@ -91,13 +90,13 @@ void MjpegPlayer::_taskLoop()
 
                 file.close();
                 if (_onPlayDone)
-                    _onPlayDone(buf);
-                Serial.println("[MJPEG] ⏹️ Playback done");
+                    _onPlayDone(msg.filePath);
+                Serial.println("[MJPEG] Playback done");
             }
-            else if (msg.cmd == MJPEG_CMD_STOP)
+            else if (msg.cmd == CMD_STOP)
             {
                 _stopRequested = true;
-                Serial.println("[MJPEG] ⏸️ Stop requested");
+                Serial.println("[MJPEG] Stop requested");
             }
         }
     }

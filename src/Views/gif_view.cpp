@@ -23,6 +23,8 @@ static QueueHandle_t gifQueue = nullptr;
 
 File f;
 
+static void (*onPlayDoneCallback)(const char *file) = nullptr;
+
 static void *GIFOpenFile(const char *fname, int32_t *pSize)
 {
 	f = LittleFS.open(fname);
@@ -210,15 +212,21 @@ static void scan_gif_files()
 	Serial.printf("✅ Total GIF files found: %d\n", gifFiles.size());
 }
 
-static void show_gif(const char *path)
+static void show_gif(const char *path, int loop = 1)
 {
 	lv_obj_add_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
-	if (gif.open(path, GIFOpenFile, GIFCloseFile, GIFReadFile, GIFSeekFile, GIFDraw))
+	while (loop)
 	{
-		while (gif.playFrame(true, NULL))
-			yield();
-		gif.close();
+		if (gif.open(path, GIFOpenFile, GIFCloseFile, GIFReadFile, GIFSeekFile, GIFDraw))
+		{
+			while (gif.playFrame(true, NULL))
+				yield();
+			gif.close();
+		}
+		loop --;
+		vTaskDelay(50);
 	}
+
 	lv_obj_clear_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
 }
 
@@ -238,10 +246,11 @@ void gif_task(void *pvParameters)
 			{
 				Screen.getScreen()->fillScreen(BLACK);
 				Serial.printf("Playing GIF: %s\n", filename);
-				show_gif(filename);
+				show_gif(filename, (int)(esp_random() % 4 + 1));
 				xSemaphoreGive(displayMutex);
+				if (onPlayDoneCallback)
+					onPlayDoneCallback(filename);
 			}
-
 			currentMode = UI_MODE_ODO;
 		}
 	}
@@ -255,7 +264,7 @@ void gif_view_init()
 		scan_gif_files();
 	}
 	gifQueue = xQueueCreate(5, sizeof(char[64]));
-	xTaskCreatePinnedToCore(gif_task, "gif_task", 8192, NULL, configMAX_PRIORITIES, NULL, 0);
+	xTaskCreatePinnedToCore(gif_task, "gif_task", 8192, NULL, configMAX_PRIORITIES - 1, NULL, 0);
 }
 
 void gif_request_show(const char *filename)
@@ -265,4 +274,8 @@ void gif_request_show(const char *filename)
 	char name[64];
 	strncpy(name, filename, sizeof(name) - 1);
 	xQueueSend(gifQueue, &name, 0);
+}
+void gif_onPlayDoneCallback(void (*cb)(const char *file))
+{
+	onPlayDoneCallback = cb;
 }
