@@ -3,7 +3,10 @@
 #include <Arduino_GFX_Library.h>
 #include "user_config.h"
 
-class ScreenDriver
+class ScreenDriver 
+#ifdef ARDUINO_CANVAS
+    : public Arduino_Canvas
+#endif
 {
 public:
     ScreenDriver();

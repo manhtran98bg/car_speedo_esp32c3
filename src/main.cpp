@@ -36,7 +36,6 @@ static void onVideoPlayDone(const char *file)
 	if (strcasecmp(file, splash_video_file) == 0)
 	{
 		main_view_init();
-		
 		gif_onPlayDoneCallback(onGifPlayDone);
 		gif_request_show("/gif/1.gif");
 	}
@@ -91,6 +90,6 @@ void loop()
 	// 	sprintf(path, "/gif/%d.gif", idx);
 	// 	gif_request_show(path);
 	// }
-	// Serial.printf("Free heap: %u bytes\n", ESP.getFreeHeap());
-	// delay(1000);
+	Serial.printf("Free heap: %u bytes\n", ESP.getFreeHeap());
+	delay(1000);
 }

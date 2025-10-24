@@ -244,7 +244,11 @@ void gif_task(void *pvParameters)
 			currentMode = UI_MODE_GIF;
 			if (xSemaphoreTake(displayMutex, pdMS_TO_TICKS(100)) == pdTRUE)
 			{
-				Screen.getScreen()->fillScreen(BLACK);
+				#ifdef ARDUINO_CANVAS
+					Screen.fillScreen(BLACK);
+				#else
+					Screen.getScreen()->fillScreen(BLACK);
+				#endif
 				Serial.printf("Playing GIF: %s\n", filename);
 				show_gif(filename, (int)(esp_random() % 4 + 1));
 				xSemaphoreGive(displayMutex);
