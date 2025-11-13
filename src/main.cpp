@@ -13,7 +13,13 @@ static int displayBack(JPEGDRAW *pDraw);
 
 MjpegPlayer *videoPlayer;
 AudioPlayer *audioPlayer;
-
+static const char *nav[] = {
+	"/gif/go_ahead.gif",
+	"/gif/go_left.gif",
+	"/gif/go_right.gif",
+	"/gif/turn_left.gif",
+	"/gif/turn_right.gif"
+};
 static int displayBack(JPEGDRAW *pDraw)
 {
 	int x1 = pDraw->x;
@@ -26,10 +32,8 @@ static int displayBack(JPEGDRAW *pDraw)
 
 static void onGifPlayDone(const char *file)
 {
-	size_t idx = (size_t)(esp_random() % 8 + 1);
-	char path[32];
-	sprintf(path, "/gif/%d.gif", idx);
-	gif_request_show(path);
+	size_t idx = (size_t)(esp_random() % 5);
+	gif_request_show(nav[idx]);
 }
 static void onVideoPlayDone(const char *file)
 {
@@ -68,14 +72,17 @@ void setup()
 		return;
 	}
 	Screen.begin();
-	videoPlayer = new MjpegPlayer(displayBack, false, 0, 0, TFT_HOR_RES, TFT_VER_RES);
-	audioPlayer = new AudioPlayer();
-	videoPlayer->begin(0);
-	audioPlayer->begin(0);
-	videoPlayer->setOnPlayDoneCallback(onVideoPlayDone);
-	audioPlayer->setOnPlayDoneCallback(onAudioPlayDone);
-	videoPlayer->playFile(splash_video_file);
-	audioPlayer->playFile(splash_audio_file);
+	main_view_init();
+	gif_onPlayDoneCallback(onGifPlayDone);
+	// gif_request_show("/gif/go_left.gif");
+	// videoPlayer = new MjpegPlayer(displayBack, false, 0, 0, TFT_HOR_RES, TFT_VER_RES);
+	// audioPlayer = new AudioPlayer();
+	// videoPlayer->begin(0);
+	// audioPlayer->begin(0);
+	// videoPlayer->setOnPlayDoneCallback(onVideoPlayDone);
+	// audioPlayer->setOnPlayDoneCallback(onAudioPlayDone);
+	// videoPlayer->playFile(splash_video_file);
+	// audioPlayer->playFile(splash_audio_file);
 }
 
 void loop()

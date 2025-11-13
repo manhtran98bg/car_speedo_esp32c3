@@ -21,6 +21,8 @@ static AnimatedGIF gif;
 static std::vector<String> gifFiles;
 static QueueHandle_t gifQueue = nullptr;
 
+static int iOffX, iOffY;
+
 File f;
 
 static void (*onPlayDoneCallback)(const char *file) = nullptr;
@@ -71,6 +73,12 @@ static int32_t GIFSeekFile(GIFFILE *pFile, int32_t iPosition)
 
 static void GIFDraw(GIFDRAW *pDraw)
 {
+
+	// if (pDraw->y == 0)
+	// { // set the memory window when the first line is rendered
+	// 	Screen.setAddrWindow(pDraw->iX, pDraw->iY, pDraw->iWidth, pDraw->iHeight);
+	// }
+	// Screen.writePixels((uint16_t *)pDraw->pPixels, pDraw->iWidth);
 	uint8_t *s;
 	uint16_t *d, *usPalette;
 	int x, y, iWidth, iCount;
@@ -123,7 +131,7 @@ static void GIFDraw(GIFDRAW *pDraw)
 			if (iCount) // any opaque pixels?
 			{
 				// DMA would degrtade performance here due to short line segments
-				Screen.drawRect(usTemp[0], pDraw->iX + x, y, iCount, 1);
+				Screen.drawRect(usTemp[0], iOffX + pDraw->iX + x, iOffY + y, iCount, 1);
 				x += iCount;
 				iCount = 0;
 			}
@@ -151,7 +159,7 @@ static void GIFDraw(GIFDRAW *pDraw)
 		else
 			for (iCount = 0; iCount < BUFFER_SIZE; iCount++)
 				usTemp[dmaBuf][iCount] = usPalette[*s++];
-		Screen.drawRect(&usTemp[dmaBuf][0], pDraw->iX, y, iCount, 1);
+		Screen.drawRect(&usTemp[dmaBuf][0], iOffX + pDraw->iX, iOffY + y, iCount, 1);
 		dmaBuf = !dmaBuf;
 		iWidth -= iCount;
 		// Loop if pixel buffer smaller than width
@@ -164,11 +172,34 @@ static void GIFDraw(GIFDRAW *pDraw)
 			else
 				for (iCount = 0; iCount < BUFFER_SIZE; iCount++)
 					usTemp[dmaBuf][iCount] = usPalette[*s++];
-			Screen.drawRect(&usTemp[dmaBuf][0], pDraw->iX, y, iCount, 1);
+			Screen.drawRect(&usTemp[dmaBuf][0], iOffX + pDraw->iX, iOffX + y, iCount, 1);
 			dmaBuf = !dmaBuf;
 			iWidth -= iCount;
 		}
 	}
+
+	// uint8_t *s = pDraw->pPixels;
+	// uint16_t *d = &usTemp[0][0];
+	// int x, iWidth;
+
+	// iWidth = pDraw->iWidth;
+	// if (iWidth + pDraw->iX > DISPLAY_WIDTH)
+	// 	iWidth = DISPLAY_WIDTH - pDraw->iX;
+
+	// int y = pDraw->iY + pDraw->y; // current line
+	// if (y >= DISPLAY_HEIGHT || pDraw->iX >= DISPLAY_WIDTH || iWidth < 1)
+	// 	return;
+
+	// // Copy cả dòng vào buffer tạm, thay pixel trong suốt bằng background
+	// for (x = 0; x < iWidth; x++)
+	// {
+	// 	uint8_t c = s[x];
+	// 	if (c == pDraw->ucTransparent)
+	// 		d[x] = 0; // pixel trong suốt -> màu nền
+	// 	else
+	// 		d[x] = pDraw->pPalette[c]; // pixel opaque -> palette
+	// }
+	// Screen.drawRect(&usTemp[dmaBuf][0], pDraw->iX, y, iWidth, 1);
 }
 
 static void scan_gif_files()
@@ -214,20 +245,23 @@ static void scan_gif_files()
 
 static void show_gif(const char *path, int loop = 1)
 {
-	lv_obj_add_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
-	while (loop)
+	// lv_obj_add_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
+	if (gif.open(path, GIFOpenFile, GIFCloseFile, GIFReadFile, GIFSeekFile, GIFDraw))
 	{
-		if (gif.open(path, GIFOpenFile, GIFCloseFile, GIFReadFile, GIFSeekFile, GIFDraw))
+		int width = gif.getCanvasWidth();
+		int height = gif.getCanvasHeight();
+		iOffX = (240 - width) / 2;
+		iOffY = (240 - height) / 2;
+		while (true)
 		{
 			while (gif.playFrame(true, NULL))
+			{
 				yield();
-			gif.close();
+			}
+			gif.reset();
 		}
-		loop --;
-		vTaskDelay(50);
 	}
-
-	lv_obj_clear_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
+	// lv_obj_clear_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
 }
 
 void gif_task(void *pvParameters)
@@ -244,13 +278,13 @@ void gif_task(void *pvParameters)
 			currentMode = UI_MODE_GIF;
 			if (xSemaphoreTake(displayMutex, pdMS_TO_TICKS(100)) == pdTRUE)
 			{
-				#ifdef ARDUINO_CANVAS
-					Screen.fillScreen(BLACK);
-				#else
-					Screen.getScreen()->fillScreen(BLACK);
-				#endif
+#ifdef ARDUINO_CANVAS
+				Screen.fillScreen(BLACK);
+#else
+				Screen.getScreen()->fillScreen(BLACK);
+#endif
 				Serial.printf("Playing GIF: %s\n", filename);
-				show_gif(filename, (int)(esp_random() % 4 + 1));
+				show_gif(filename, 1);
 				xSemaphoreGive(displayMutex);
 				if (onPlayDoneCallback)
 					onPlayDoneCallback(filename);

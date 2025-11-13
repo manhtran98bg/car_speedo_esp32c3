@@ -111,6 +111,9 @@ void main_view_init()
     disp_drv.full_refresh = true;
     lv_disp_drv_register(&disp_drv);
     ui_init();
+    // lv_obj_t * label = lv_obj_create(lv_scr_act());
+    // lv_label_set_text(label, "Hello");
+    // lv_obj_set_pos(label, 10, 50);
     gif_view_init();
     needle_Animation(uic_img_needle, 200);
     lv_timer_create([](lv_timer_t *t)
@@ -120,5 +123,5 @@ void main_view_init()
     lv_timer_create([](lv_timer_t *t)
                     { ready = true; }, 3000, NULL);
     xTaskCreate(mainUi_task, "mainUi_task", 4096, NULL, configMAX_PRIORITIES, NULL);
-    xTaskCreate(updateData_task, "updateData_task", 4096, NULL, configMAX_PRIORITIES - 2, NULL);
+    // xTaskCreate(updateData_task, "updateData_task", 4096, NULL, configMAX_PRIORITIES - 2, NULL);
 }

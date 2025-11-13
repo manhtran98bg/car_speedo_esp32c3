@@ -17,7 +17,9 @@ public:
     void fadeIn();
     void drawRect(uint16_t *data, int16_t x, int16_t y, int16_t w, int16_t h);
     void drawRegion(uint16_t *data, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
-    Arduino_GFX *getScreen();
+    void setAddrWindow( int16_t x, int16_t y, int16_t w, int16_t h);
+    void writePixels(uint16_t *data, uint32_t siz);
+    Arduino_TFT *getScreen();
 private:
     // LEDC constants
     static constexpr int LEDC_TIMER_RES = 8;
@@ -28,7 +30,7 @@ private:
     static constexpr int LEDC_FREQ = 5000;
 
     Arduino_DataBus *_bus;
-    Arduino_GFX *_tft;
+    Arduino_TFT *_tft;
     static void fadeInTask(void *param);
     
 };

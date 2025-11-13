@@ -2,10 +2,10 @@
 
 ScreenDriver Screen;
 
-static Arduino_GFX *GetTFTInstance()
+static Arduino_TFT *GetTFTInstance()
 {
     static Arduino_DataBus *bus = new Arduino_ESP32SPI(LCD_DC, LCD_CS, LCD_SCLK, LCD_SDA, -1, FSPI);
-    static Arduino_GFX *tft = new Arduino_GC9A01(bus, LCD_RST, 0, true, LCD_WIDTH, LCD_HEIGHT);
+    static Arduino_TFT *tft = new Arduino_GC9A01(bus, LCD_RST, 0, true, LCD_WIDTH, LCD_HEIGHT);
     return tft;
 }
 
@@ -93,6 +93,12 @@ void ScreenDriver::drawRect(uint16_t *data, int16_t x, int16_t y, int16_t w, int
         _tft->draw16bitRGBBitmap(x, y, data, w, h);
     #endif
 }
-Arduino_GFX *ScreenDriver::getScreen() {
+void ScreenDriver::setAddrWindow( int16_t x, int16_t y, int16_t w, int16_t h) {
+    _tft->setAddrWindow(x, y, w, h);
+}
+void ScreenDriver::writePixels(uint16_t *data, uint32_t size) {
+    _tft->writePixels(data, size);
+}
+Arduino_TFT *ScreenDriver::getScreen() {
     return _tft;
 }

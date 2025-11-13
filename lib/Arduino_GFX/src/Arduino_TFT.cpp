@@ -191,7 +191,9 @@ void Arduino_TFT::writeBytes(uint8_t *data, uint32_t len)
 
 void Arduino_TFT::writePixels(uint16_t *data, uint32_t len)
 {
+  _bus->beginWrite();
   _bus->writePixels(data, len);
+  _bus->endWrite();
 }
 
 void Arduino_TFT::pushColor(uint16_t color)
