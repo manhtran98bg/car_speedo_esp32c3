@@ -19,6 +19,7 @@ public:
     void fadeIn();
     void drawRect(uint16_t *data, int16_t x, int16_t y, int16_t w, int16_t h);
     void drawRegion(uint16_t *data, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
+    void fillScreen(uint16_t color);
     
 private:
     // LEDC constants

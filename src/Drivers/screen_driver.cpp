@@ -21,6 +21,7 @@ void ScreenDriver::begin()
     _panel->init();
     _panel->setRotation(0);
 	_panel->setColorDepth(16);
+    // _panel->setSwapBytes(1);
 	_panel->fillScreen(_panel->color565(0, 0, 0));
     LGFX_Sprite::setColorDepth(1);
     LGFX_Sprite::setPsram(false);
@@ -66,11 +67,15 @@ void ScreenDriver::drawRegion(uint16_t *data, int16_t x1, int16_t y1, int16_t x2
     uint32_t h = (y2 - y1 + 1);
     if (w <= 0 || h <= 0)
         return;
-    // Arduino_Canvas::flushDirectNoCanvasBuffer(x1, y1, data, w, h);
+    _panel->pushImageDMA(x1, y1, w, h, data);
 }
 void ScreenDriver::drawRect(uint16_t *data, int16_t x, int16_t y, int16_t w, int16_t h)
 {
     if (w <= 0 || h <= 0)
         return;
-    // Arduino_Canvas::flushDirectNoCanvasBuffer(x, y, data, w, h);
+    _panel->pushImageDMA(x, y, w, h, data);
+}
+void ScreenDriver::fillScreen(uint16_t color) 
+{
+    _panel->fillScreen(color);
 }

@@ -62,7 +62,7 @@ static void onAudioPlayDone(const char *file)
 void setup()
 {
 	// put your setup code here, to run once:
-	// delay(2000);
+	delay(2000);
 	Serial.begin(115200);
 
 	// Version Arduino Core
