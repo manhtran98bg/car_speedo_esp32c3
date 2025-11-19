@@ -281,7 +281,7 @@ void gif_task(void *pvParameters)
 #ifdef ARDUINO_CANVAS
 				Screen.fillScreen(BLACK);
 #else
-				Screen.getScreen()->fillScreen(BLACK);
+				// Screen.getScreen()->fillScreen(BLACK);
 #endif
 				Serial.printf("Playing GIF: %s\n", filename);
 				show_gif(filename, 1);

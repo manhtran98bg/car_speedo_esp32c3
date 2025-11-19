@@ -5,6 +5,8 @@
 #include "LittleFS.h"
 #include "Services/mjpeg_player.h"
 #include "Services/audio_player.h"
+#include "Eyes/Face.h"
+
 static long lastCmd = 0;
 static const char *splash_video_file = "/video/splash.mjpeg";
 static const char *splash_audio_file = "/audio/splash.aac";
@@ -13,6 +15,10 @@ static int displayBack(JPEGDRAW *pDraw);
 
 MjpegPlayer *videoPlayer;
 AudioPlayer *audioPlayer;
+
+Face face(240, 240, 60);
+
+
 static const char *nav[] = {
 	"/gif/go_ahead.gif",
 	"/gif/go_left.gif",
@@ -72,8 +78,11 @@ void setup()
 		return;
 	}
 	Screen.begin();
-	main_view_init();
-	gif_onPlayDoneCallback(onGifPlayDone);
+	face.RandomBehavior = true;
+	face.RandomBlink = true;
+	face.RandomLook = true;
+	// main_view_init();
+	// gif_onPlayDoneCallback(onGifPlayDone);
 	// gif_request_show("/gif/go_left.gif");
 	// videoPlayer = new MjpegPlayer(displayBack, false, 0, 0, TFT_HOR_RES, TFT_VER_RES);
 	// audioPlayer = new AudioPlayer();
@@ -87,6 +96,7 @@ void setup()
 
 void loop()
 {
+	static size_t lastCheckHeap = millis();
 	// put your main code here, to run repeatedly:
 
 	// if (millis() - lastCmd > 30000)
@@ -97,6 +107,9 @@ void loop()
 	// 	sprintf(path, "/gif/%d.gif", idx);
 	// 	gif_request_show(path);
 	// }
-	Serial.printf("Free heap: %u bytes\n", ESP.getFreeHeap());
-	delay(1000);
+	if (millis() - lastCheckHeap > 1000) {
+		Serial.printf("Free heap: %u bytes\n", ESP.getFreeHeap());
+		lastCheckHeap = millis();
+	}
+	face.Update();
 }
