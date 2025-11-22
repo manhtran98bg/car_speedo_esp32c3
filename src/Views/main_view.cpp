@@ -5,7 +5,7 @@
 #include "main_view.h"
 #include "user_config.h"
 #include "Models/data_model.h"
-#include "Drivers/screen_driver.h"
+#include "Drivers/Display/ScreenDriver.h"
 
 #include "gif_view.h"
 // ==== Display driver ==== //

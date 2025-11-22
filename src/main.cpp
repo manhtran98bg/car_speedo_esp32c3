@@ -1,11 +1,17 @@
 #include <Arduino.h>
-#include "Drivers/screen_driver.h"
+
 #include "Views/main_view.h"
 #include "Views/gif_view.h"
 #include "LittleFS.h"
 #include "Services/mjpeg_player.h"
 #include "Services/audio_player.h"
-#include "Eyes/Face.h"
+
+#include "Drivers/Display/ScreenDriver.h"
+#include "Drivers/Display/CanvasLvgl.h"
+#include "Drivers/Display/CanvasLGFX.h"
+#include "Drivers/Display/CanvasManagerLvgl.h"
+#include "Drivers/Display/CanvasManagerLGFX.h"
+#include "Face.h"
 
 static long lastCmd = 0;
 static const char *splash_video_file = "/video/splash.mjpeg";
@@ -16,16 +22,16 @@ static int displayBack(JPEGDRAW *pDraw);
 MjpegPlayer *videoPlayer;
 AudioPlayer *audioPlayer;
 
-Face face(240, 240, 60);
-
+ICanvasManager *canvasManager = new CanvasManagerLGFX();
+Face *face;
+ICanvas *canvas;
 
 static const char *nav[] = {
 	"/gif/go_ahead.gif",
 	"/gif/go_left.gif",
 	"/gif/go_right.gif",
 	"/gif/turn_left.gif",
-	"/gif/turn_right.gif"
-};
+	"/gif/turn_right.gif"};
 static int displayBack(JPEGDRAW *pDraw)
 {
 	int x1 = pDraw->x;
@@ -78,9 +84,17 @@ void setup()
 		return;
 	}
 	Screen.begin();
-	face.RandomBehavior = true;
-	face.RandomBlink = true;
-	face.RandomLook = true;
+	int id = canvasManager->createCanvas(240, 240, 1);
+	if (id == -1)
+	{
+		Serial.println("Create canvas failed");
+		return;
+	}
+	canvas = canvasManager->getCanvasWrapper(id);
+	if (canvas)
+	{
+		face = new Face(canvas, 50, 240, 240, BLACK, YELLOW);
+	}
 	// main_view_init();
 	// gif_onPlayDoneCallback(onGifPlayDone);
 	// gif_request_show("/gif/go_left.gif");
@@ -107,9 +121,10 @@ void loop()
 	// 	sprintf(path, "/gif/%d.gif", idx);
 	// 	gif_request_show(path);
 	// }
-	if (millis() - lastCheckHeap > 1000) {
+	if (millis() - lastCheckHeap > 1000)
+	{
 		Serial.printf("Free heap: %u bytes\n", ESP.getFreeHeap());
 		lastCheckHeap = millis();
 	}
-	face.Update();
+	face->Update();
 }

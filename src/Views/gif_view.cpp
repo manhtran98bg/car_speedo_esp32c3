@@ -6,7 +6,7 @@
 #include "LittleFS.h"
 #include "ui.h"
 
-#include "Drivers/screen_driver.h"
+#include "Drivers/Display/ScreenDriver.h"
 #include "user_config.h"
 #include "gif_view.h"
 
@@ -278,7 +278,7 @@ void gif_task(void *pvParameters)
 			currentMode = UI_MODE_GIF;
 			if (xSemaphoreTake(displayMutex, pdMS_TO_TICKS(100)) == pdTRUE)
 			{
-				Screen.fillScreen(0);
+				// Screen.fillScreen(0);
 				Serial.printf("Playing GIF: %s\n", filename);
 				show_gif(filename, 1);
 				xSemaphoreGive(displayMutex);

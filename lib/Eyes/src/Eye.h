@@ -10,54 +10,47 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses
 ****************************************************/
 
-#ifndef _FACE_h
-#define _FACE_h
+#ifndef _EYE_h
+#define _EYE_h
 
 #include <Arduino.h>
 #include "Common.h"
 #include "Animations.h"
-#include "EyePresets.h"
-#include "Eye.h"
-#include "FaceExpression.h"
-#include "FaceBehavior.h"
-#include "LookAssistant.h"
-#include "BlinkAssistant.h"
+#include "EyeConfig.h"
+#include "EyeDrawer.h"
+#include "EyeTransition.h"
+#include "EyeTransformation.h"
+#include "EyeVariation.h"
+#include "EyeBlink.h"
+#include "EyeVariation.h"
 
-class Face {
+class Face;
 
-public:
-    Face(uint16_t screenWidth, uint16_t screenHeight, uint16_t eyeSize);
-
-    uint16_t Width;
-    uint16_t Height;
-    uint16_t CenterX;
-    uint16_t CenterY;
-    uint16_t EyeSize;
-    uint16_t EyeInterDistance = 4;
-
-    Eye LeftEye;
-    Eye RightEye;
-    BlinkAssistant Blink;
-    LookAssistant Look;
-    FaceBehavior Behavior;
-    FaceExpression Expression;
+class Eye {
+  protected:
+    Face& _face;
 
     void Update();
-    void DoBlink();
+    void ChainOperators();
 
-    bool RandomBehavior = true;
-    bool RandomLook = true;
-    bool RandomBlink = true;
+  public:
+    Eye(Face& face);
+    uint16_t CenterX;
+    uint16_t CenterY;
+    bool IsMirrored = false;
 
-    void LookLeft();
-    void LookRight();
-    void LookFront();
-    void LookTop();
-    void LookBottom();
-    void Wait(unsigned long milliseconds);
+    EyeConfig Config;
+    EyeConfig* FinalConfig;
 
-protected:
-    void Draw();
+    EyeTransition Transition;
+    EyeTransformation Transformation;
+    EyeVariation Variation1;
+    EyeVariation Variation2;
+    EyeBlink BlinkTransformation;
+
+    void ApplyPreset(const EyeConfig preset);
+    void TransitionTo(const EyeConfig preset);
+    void Draw(ICanvas* canvas);
 };
 
 #endif

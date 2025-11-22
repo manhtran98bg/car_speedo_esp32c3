@@ -11,11 +11,10 @@ You should have received a copy of the GNU Affero General Public License along w
 ****************************************************/
 
 #include "Eye.h"
-
+#include "Face.h"
 Eye::Eye(Face& face) : _face(face) {
 
   this->IsMirrored = false;
-
 	ChainOperators();
 	Variation1.Animation._t0 = 200;
 	Variation1.Animation._t1 = 200;
@@ -49,9 +48,9 @@ void Eye::Update() {
 	BlinkTransformation.Update();
 }
 
-void Eye::Draw() {
+void Eye::Draw(ICanvas* canvas) {
 	Update();
-	EyeDrawer::Draw(CenterX, CenterY, FinalConfig);
+	EyeDrawer::Draw(canvas, CenterX, CenterY, FinalConfig);
 }
 
 void Eye::ApplyPreset(const EyeConfig config) {

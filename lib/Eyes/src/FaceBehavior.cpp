@@ -33,7 +33,7 @@ static const eEmotions moods[] = {
 	eEmotions::Scared, //Sợ hãi
 	eEmotions::Awe, //Kinh ngạc
 }; 
-FaceBehavior::FaceBehavior(Face& face) : _face(face), Timer(5000) {
+FaceBehavior::FaceBehavior(Face& face) : _face(face), Timer(6000) {
 	Timer.Start();
 	UseAllEmotion();
 }

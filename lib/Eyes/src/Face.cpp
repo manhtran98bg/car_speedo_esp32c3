@@ -12,20 +12,24 @@ You should have received a copy of the GNU Affero General Public License along w
 
 #include "Face.h"
 #include "Common.h"
-#include "Drivers/screen_driver.h"
 
-Face::Face(uint16_t screenWidth, uint16_t screenHeight, uint16_t eyeSize)
-	: LeftEye(*this), RightEye(*this), Blink(*this), Look(*this), Behavior(*this), Expression(*this)
+Face::Face(ICanvas* canvas, uint16_t eyeSize, uint16_t screenWidth, uint16_t screenHeight, uint16_t backgroundColor , uint16_t eyeColor)
+	: _canvas(canvas), LeftEye(*this), RightEye(*this), Blink(*this), Look(*this), Behavior(*this), Expression(*this)
 {
-	Width = screenWidth;
-	Height = screenHeight;
+	Width = canvas->width();
+	Height = canvas->height();
 	EyeSize = eyeSize;
 
 	CenterX = Width / 2;
 	CenterY = Height / 2;
 
 	LeftEye.IsMirrored = true;
+	_x = (screenWidth - Width) / 2;
+	_y = (screenHeight - Height) / 2;
+	canvas->setBackgroundColor(backgroundColor);
+	canvas->setForegroundColor(eyeColor);
 	Behavior.Timer.Start();
+	Behavior.GoToEmotion(eEmotions::Normal);
 }
 
 void Face::LookFront()
@@ -81,14 +85,19 @@ void Face::Update()
 
 void Face::Draw()
 {
-	Screen.fillScreen(0);
+	_canvas->clear(0);
 	// Draw left eye
 	LeftEye.CenterX = CenterX - EyeSize / 2 - EyeInterDistance;
 	LeftEye.CenterY = CenterY;
-	LeftEye.Draw();
+	LeftEye.Draw(_canvas);
 	// Draw right eye
 	RightEye.CenterX = CenterX + EyeSize / 2 + EyeInterDistance;
 	RightEye.CenterY = CenterY;
-	RightEye.Draw();
-	Screen.pushSprite(0,0);
+	RightEye.Draw(_canvas);
+	_canvas->push(_x, _y);
+}
+void Face::SetPos(int x, int y) 
+{
+	_x = x;
+	_y = y;
 }
